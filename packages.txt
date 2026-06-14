@@ -1,1 +1,1 @@
-fonts-dejavu
+fonts-dejavu-core
