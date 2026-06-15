@@ -418,7 +418,7 @@ with st.sidebar:
     st.divider()
 
     if section == "Три режима из диплома":
-        st.markdown("**Выбери режимы для отображения:**")
+        st.markdown("**Режимы из диплома:**")
         show_100 = st.checkbox("100 °C / 60 с — нет переноса",  value=True)
         show_200 = st.checkbox("200 °C / 60 с — оптимальный",   value=True)
         show_220 = st.checkbox("220 °C / 150 с — расплывание",  value=True)
@@ -429,8 +429,12 @@ with st.sidebar:
     elif section == "Свой режим":
         fib_lbl = st.radio("Материал",["Полиэстер (ПЭТ)","Шёлк"])
         fiber   = "PET" if "ПЭТ" in fib_lbl else "SILK"
-        Tp_usr  = st.slider("Температура плиты, °C", 80, 220, 200, 5)
-        tau_usr = st.slider("Время выдержки τ, с",   20, 300, 60, 10)
+        st.divider()
+        st.markdown("**Задай параметры режима:**")
+        Tp_usr  = st.slider("Температура плиты, °C", 80, 220, 200, 5,
+                            help="Рабочий диапазон термопресса: 80–220 °C")
+        tau_usr = st.slider("Время выдержки τ, с", 20, 300, 60, 10,
+                            help="Типичный диапазон: 30–180 с")
     else:
         fiber = "PET"
         st.info("Карта строится для ПЭТ (есть данные таблицы 2.1).")
@@ -580,7 +584,8 @@ elif section == "Свой режим":
         res = run_single(int(Tp_usr), int(tau_usr), fiber)
 
     # Метрики
-    st.subheader("📊 Результаты расчёта")
+    st.subheader(f"📊 Результаты расчёта — {Tp_usr} °C / {tau_usr} с")
+    st.caption(f"Пересчитывается автоматически при изменении слайдеров")
     m1,m2,m3,m4 = st.columns(4)
     m1.metric("Температура ткани Tмакс", f"{res['Tmax']:.0f} °C",
         f"{res['Tmax']-TG:+.0f} °C к порогу Tg={TG:.0f} °C",
@@ -600,7 +605,6 @@ elif section == "Свой режим":
 
     # Два главных графика (как в дипломе)
     st.subheader("📈 Графики")
-    results_usr = {f"{Tp_usr}/{tau_usr}": res}
     g1,g2 = st.columns(2)
 
     with g1:
